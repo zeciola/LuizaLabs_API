@@ -1,6 +1,6 @@
 from marshmallow import ValidationError, fields, validates
 
-from app import ma, app
+from app import ma
 from app.models.client import Client
 
 
