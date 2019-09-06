@@ -27,15 +27,15 @@ class ProductSchema(ma.ModelSchema):
     #     raise ValidationError("Please, don't send id")
 
 
-product_share_schema = ProductSchema()
-products_share_schema = ProductSchema(many=True)
+product_share_schema: ProductSchema = ProductSchema()
+products_share_schema: ProductSchema = ProductSchema(many=True)
 
 
 class FavoriteProductSchema(ma.ModelSchema):
     class Meta:
         fields = [
             'id',
-            'favorite_product',
+            'favorite',
             'client_id',
             'product_id'
         ]
@@ -49,5 +49,5 @@ class FavoriteProductSchema(ma.ModelSchema):
     #     raise ValidationError("Please, don't send id")
 
 
-favorite_product_share_schema = FavoriteProductSchema()
-favorites_products_share_schema = FavoriteProductSchema(many=True)
+favorite_product_share_schema: FavoriteProductSchema = FavoriteProductSchema()
+favorites_products_share_schema: FavoriteProductSchema = FavoriteProductSchema(many=True)

@@ -12,13 +12,17 @@ class Client(db.Model):
     fullname: str = db.Column(db.String(128), nullable=False)
     email: str = db.Column(db.String(128), nullable=False, unique=True)
     password: str = db.Column(db.String(128), nullable=False)
-    favorite_products = db.relationship(FavoriteProduct, backref=backref('client'))
+
+    favorite_products = db.relationship(
+        FavoriteProduct,
+        backref=backref('client')
+    )
+
+    def verify_password(self, password) -> bool:
+        return check_password_hash(pwhash=self.password, password=password)
 
     def hash_password(password) -> str:
         return generate_password_hash(password)
-
-    def verify_password(self, password) -> bool:
-        return check_password_hash(password, self.password)
 
     def __repr__(self):
         return f"<Client : {self.fullname} >"
