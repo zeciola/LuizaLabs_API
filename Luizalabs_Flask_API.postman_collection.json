@@ -13,10 +13,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": ""
 						},
@@ -29,10 +25,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": ""
 						},
@@ -45,10 +37,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": ""
 						},
@@ -61,10 +49,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": ""
 						},
@@ -82,10 +66,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": ""
 						},
@@ -98,10 +78,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": ""
 						},
@@ -114,10 +90,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": ""
 						},
@@ -130,10 +102,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": ""
 						},
@@ -146,10 +114,6 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": ""
 						},
@@ -167,18 +131,98 @@
 					"request": {
 						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": ""
-						},
 						"url": {
 							"raw": ""
 						},
 						"description": "{\n\t\"favorite\":true,\n\t\"client_id\":1,\n\t\"product_id\":1\n}"
 					},
 					"response": []
+				},
+				{
+					"name": "Show by client_id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Change by product_id and client_id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						},
+						"description": "{\n  \"favorite_update\": { \"client_id\": 1, \"product_id\": 1},\n  {\n\t\"favorite\":false,\n\t\"client_id\":2,\n\t\"product_id\":1\n\t}\n}"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete by product_id and client_id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						},
+						"description": "{\n  \"favorite_update\": { \"client_id\": 1, \"product_id\": 1},\n  {\n\t\"favorite\":false,\n\t\"client_id\":2,\n\t\"product_id\":1\n\t}\n}"
+					},
+					"response": []
 				}
 			]
+		},
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": ""
+						},
+						"description": "{ \n\t\"email\": \"tesdsdstnovo@tesdsdtnovo.com.br\",\n\t\"password\": \"12345\"\n}"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1Njc3NDAzNTYsIm5iZiI6MTU2Nzc0MDM1NiwianRpIjoiOWIzZjU1NTMtMjdmYi00MGEyLWI3MWYtNjllODlmNzdmMTA5IiwiZXhwIjoxNTY3NzQwOTU2LCJpZGVudGl0eSI6MiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.h4VJsb18J2YJ_zbszPzBr1BE-7V4oKeVFw8_L78pT98",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "b2b15bbb-1f0c-45fe-8e6b-5702c31acb1f",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "ec151e64-ba21-4214-ba64-f47627c1ba3d",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
 		}
 	]
 }
