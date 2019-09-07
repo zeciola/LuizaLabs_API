@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from http import HTTPStatus
 from flask_jwt_extended import jwt_required
+from sqlalchemy.exc import SQLAlchemyError
 
 from app import db
 from app.models.product import FavoriteProduct
@@ -43,8 +44,8 @@ def product_register() -> (dict, HTTPStatus):
 
     except KeyError:
         return jsonify({'error': 'Payload is not valid'})
-    except Exception as e:
-        return jsonify({'error': e.orig.args}), HTTPStatus.BAD_REQUEST
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
 
 @blueprint_product.route('/product/show/title', methods=['POST'])
@@ -99,8 +100,8 @@ def product_change_by_title() -> (dict, HTTPStatus):
 
     except KeyError:
         return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
-    except Exception as e:
-        return jsonify({'error': e.orig.args}), HTTPStatus.BAD_REQUEST
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
 
 @blueprint_product.route('/product/delete/title/', methods=['DELETE'])
@@ -122,8 +123,8 @@ def product_delete_by_title() -> (dict, HTTPStatus):
         ), HTTPStatus.OK
     except KeyError:
         return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
-    except Exception as e:
-        return jsonify({'error': e.orig.args}), HTTPStatus.BAD_REQUEST
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
 
 @blueprint_product.route('/product/favorite/register', methods=['POST'])
@@ -166,8 +167,8 @@ def favorite_product_register() -> (dict, HTTPStatus):
 
     except KeyError:
         return jsonify({'error': 'Payload is not valid'})
-    except Exception as e:
-        return jsonify({'error': e.orig.args}), HTTPStatus.BAD_REQUEST
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
 
 @blueprint_product.route('/product/favorite/show/client/<identifier>', methods=['GET'])
@@ -187,8 +188,8 @@ def favorite_product_show_by_client_id(identifier: int) -> (dict, HTTPStatus):
 
     except KeyError:
         return jsonify({'error': 'Payload is not valid'})
-    except Exception as e:
-        return jsonify({'error': e.orig.args}), HTTPStatus.BAD_REQUEST
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
 
 @blueprint_product.route('/product/favorite/change/', methods=['PUT'])
@@ -225,8 +226,8 @@ def favorite_product_change() -> (dict, HTTPStatus):
 
     except KeyError:
         return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
-    except Exception as e:
-        return jsonify({'error': e.orig.args}), HTTPStatus.BAD_REQUEST
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
 
 @blueprint_product.route('/product/favorite/delete/', methods=['DELETE'])
@@ -250,5 +251,5 @@ def favorite_product_delete() -> (dict, HTTPStatus):
 
     except KeyError:
         return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
-    except Exception as e:
-        return jsonify({'error': e.orig.args}), HTTPStatus.BAD_REQUEST
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST

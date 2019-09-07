@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
-from http import HTTPStatus
 from flask_jwt_extended import jwt_required
+from http import HTTPStatus
+from sqlalchemy.exc import SQLAlchemyError
 
 from app import db
 from ..models.client import Client
@@ -17,27 +18,25 @@ def client_register() -> (dict, HTTPStatus):
             email = request.json['email']
             password = request.json['password']
 
-            client = Client(fullname=fullname, email=email, password=password)
-            password = Client.hash_password(password=password)
+            password_hash = Client.hash_password(password=password)
+            client = Client(fullname=fullname, email=email, password=password_hash)
 
-            if client.verify_password(password=password):
+        if client.verify_password(password=password):
 
-                client.password = password
+            db.session.add(client)
+            db.session.commit()
 
-                db.session.add(client)
-                db.session.commit()
-
-                result = client_share_schema.dump(
-                    Client.query.filter_by(email=email).first()
-                )
-                return result, HTTPStatus.CREATED
-            else:
-                return jsonify({'error': 'generate password fail'}), HTTPStatus.BAD_REQUEST
+            result = client_share_schema.dump(
+                Client.query.filter_by(email=email).first()
+            )
+            return result, HTTPStatus.CREATED
+        else:
+            return jsonify({'error': 'generate password fail'}), HTTPStatus.BAD_REQUEST
 
     except KeyError:
         return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
-    except Exception as e:
-        return jsonify({'error': e.orig.args}), HTTPStatus.BAD_REQUEST
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
 
 @blueprint_client.route('/client/show/email', methods=['POST'])
@@ -45,16 +44,17 @@ def client_register() -> (dict, HTTPStatus):
 def client_show_by_email() -> (dict, HTTPStatus):
     try:
         if request.method == 'POST':
-            result = client_share_schema.dump(
-                Client.query.filter_by(email=request.json['email']).first()
-            )
+            email = request.json['email']
 
-            return jsonify(result), HTTPStatus.FOUND
+            result = client_share_schema.dump(
+                Client.query.filter_by(email=email).first()
+            )
+        return jsonify(result), HTTPStatus.FOUND.value
 
     except KeyError:
         return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
-    except Exception as e:
-        return jsonify({'error': e.orig.args}), HTTPStatus.BAD_REQUEST
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
 
 @blueprint_client.route('/client/change/email/', methods=['PUT'])
@@ -69,23 +69,35 @@ def client_change_by_email() -> (dict, HTTPStatus):
             if not client_share_schema.dump(client_query):
                 return jsonify({'msg': 'Client not found'}), HTTPStatus.NO_CONTENT
 
-            client_query.fullname = request.json['fullname']
-            client_query.email = request.json['email']
-            client_query.password = request.json['password']
+            fullname =  request.json['fullname']
+            email = request.json['email']
+            password = request.json['password']
 
-            db.session.commit()
+            client_query.fullname = fullname
+            client_query.email = email
 
-            result = client_share_schema.dump(
-                Client.query.filter_by(email=request.json['email']).first()
-            )
+            password_hash = Client.hash_password(password)
 
-            return jsonify(result), HTTPStatus.OK
+            client = Client(fullname=fullname, email=email, password=password_hash)
+
+            if client.verify_password(password=password):
+
+                client_query.password = password_hash
+
+                db.session.commit()
+
+                result = client_share_schema.dump(
+                    Client.query.filter_by(email=request.json['email']).first()
+                )
+
+                return jsonify(result), HTTPStatus.OK
+            else:
+                return jsonify({'error': 'generate password fail'}), HTTPStatus.BAD_REQUEST
 
     except KeyError:
         return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
-    except Exception as e:
-        return jsonify({'error': e.orig.args}), HTTPStatus.BAD_REQUEST
-
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
 @blueprint_client.route('/client/delete/email/', methods=['DELETE'])
 @jwt_required
@@ -107,5 +119,5 @@ def client_delete_by_email() -> (dict, HTTPStatus):
 
     except KeyError:
         return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
-    except Exception as e:
-        return jsonify({'error': e.orig.args}), HTTPStatus.BAD_REQUEST
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
