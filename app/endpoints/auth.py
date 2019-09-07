@@ -12,6 +12,7 @@ blueprint_auth = Blueprint('auth', __name__, url_prefix='/api')
 def login() -> (dict, HTTPStatus):
     try:
         if request.method == 'POST':
+
             email = request.json['email']
             password = request.json['password']
 
@@ -25,7 +26,7 @@ def login() -> (dict, HTTPStatus):
                     identity=client.id
                 )
                 msg_token = dict(
-                    acess_token={'Authorization': f'Bearer {access_token}'},
+                    access_token={'Authorization': f'Bearer {access_token}'},
                     refresh_token={'Authorization': f'Bearer {refresh_token}'},
                 )
 
@@ -36,4 +37,4 @@ def login() -> (dict, HTTPStatus):
     except KeyError:
         return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
     except Exception as e:
-        return jsonify({'error': e.orig.args}), HTTPStatus.BAD_REQUEST
+        return jsonify({'error': e.args[0]}), HTTPStatus.BAD_REQUEST

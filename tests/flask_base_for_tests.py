@@ -1,12 +1,27 @@
-from unittest import TestCase
-
 from flask import url_for
+from unittest import TestCase
 from json import loads
 
-from app import app
+from app import app, db
+
+SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/luizalabs_test.db"
+TESTING = True
 
 
 class BaseTestAPI(TestCase):
+
+    def create_app(self):
+        app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+        app.config['JWT_SECRET_KEY'] = "Magalu gosta de programar no Luizalabs :)"
+        app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+        app.config['FLASK_DEBUG'] = TESTING
+        app.config['FLASK_ENV'] = 'Development'
+        app.config['FLASK_APP'] = 'app/main.py'
+        app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = False
+
+        app.db = db
+
+        return app
 
     def setUp(self):
         self.app = app
@@ -38,8 +53,10 @@ class BaseTestAPI(TestCase):
         }
 
     def tearDown(self):
+        self.app.db.session.remove()
         self.app.db.drop_all()
 
+    # TODO: fazer a criação direto no banco com SQL_ALCHEMY em vez de utilizar os endpoints
     def create_client(self):
         self.app_client.post(url_for('client.client_register'), json=self.client)
 
@@ -54,4 +71,4 @@ class BaseTestAPI(TestCase):
 
         login_token = self.app_client.post(url_for('auth.login'), json=self.client)
 
-        return loads(login_token.data.decode())["acess_token"]
+        return loads(login_token.data.decode())['msg']["access_token"]
