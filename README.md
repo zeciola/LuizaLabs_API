@@ -10,7 +10,7 @@ flask run
 ```
 
 ## Use Postman collection:
-### Luizalabs_Flask_API.postman_collection.json
+```Luizalabs_Flask_API.postman_collection.json```
 
 ## Flask Routes:
 ```
