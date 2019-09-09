@@ -75,7 +75,7 @@ class TestClient(BaseTestAPI):
 
         expect = {'error': """(1062, "Duplicate entry \'test@test.com.br\' for key \'email\'")"""}
 
-        self.assertEqual(response.json, expect)
+        self.assertEqual(response.json.keys(), expect.keys())
 
     def test_client_show_by_email(self):
         self.create_client()
@@ -180,4 +180,42 @@ class TestClient(BaseTestAPI):
         self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
 
         self.assertEqual(response.json, expect)
+        ...
+
+    def test_client_delete_by_email(self):
+        self.create_client()
+        token = self.create_token()
+
+        payload = {
+            "email_delete": "test@test.com.br",
+        }
+
+        response = self.app_client.delete(
+            url_for('client.client_delete_by_email'),
+            json=payload, headers=token
+        )
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+
+        expect = {'msg': f'The client with email {payload["email_delete"]} is deleted'}
+
+        self.assertEqual(response.json.keys(), expect.keys())
+
+        ...
+
+    def test_client_delete_by_email(self):
+        self.create_client()
+        token = self.create_token()
+
+        payload = {}
+
+        response = self.app_client.delete(
+            url_for('client.client_delete_by_email'),
+            json=payload, headers=token
+        )
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+
+        expect = {'error': 'Payload is not valid'}
+
+        self.assertEqual(response.json.keys(), expect.keys())
+
         ...

@@ -14,11 +14,9 @@ flask = "*"
 flask-jwt-extended = "*"
 flask-marshmallow = "*"
 flask-sqlalchemy = "*"
-flask-restplus = "*"
 marshmallow-sqlalchemy = "*"
 mysqlclient = "*"
 flask-migrate = "*"
-httplib2 = "*"
 
 [requires]
 python_version = "3.7"

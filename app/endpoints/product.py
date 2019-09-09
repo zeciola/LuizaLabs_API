@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from http import HTTPStatus
 from flask_jwt_extended import jwt_required
+from http import HTTPStatus
 from sqlalchemy.exc import SQLAlchemyError
 
 from app import db
@@ -43,7 +43,7 @@ def product_register() -> (dict, HTTPStatus):
             return result, HTTPStatus.CREATED
 
     except KeyError:
-        return jsonify({'error': 'Payload is not valid'})
+        return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
     except SQLAlchemyError as e:
         return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
@@ -53,28 +53,41 @@ def product_register() -> (dict, HTTPStatus):
 def product_show_by_title() -> (dict, HTTPStatus):
     try:
         if request.method == 'POST':
+            title = request.json['title']
+
             result = product_share_schema.dump(
                 Product.query.filter_by(title=request.json['title']).first()
             )
+            if not result:
+                return jsonify({'msg': f'Product with title {title} not found'}), HTTPStatus.OK
 
-        return jsonify(result), HTTPStatus.FOUND
+            return jsonify(result), HTTPStatus.FOUND
+
     except KeyError:
         return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
+    except SQLAlchemyError as e:
+        return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
 
 @blueprint_product.route('/product/<identifier>', methods=['GET'])
 @jwt_required
 def product_show_by_id(identifier: int) -> (dict, HTTPStatus):
     if request.method == 'GET':
+        if not identifier:
+            return jsonify({'error': 'Please send a id of product'}), HTTPStatus.BAD_REQUEST
+
         result = product_share_schema.dump(
             Product.query.filter_by(id=identifier).first()
         )
 
-    return jsonify(result), HTTPStatus.FOUND
+        if not result:
+            return jsonify({'msg': f'Product with id {identifier} not found'}), HTTPStatus.OK
+
+        return jsonify(result), HTTPStatus.FOUND
 
 
-@jwt_required
 @blueprint_product.route('/product/change/title/', methods=['PUT'])
+@jwt_required
 def product_change_by_title() -> (dict, HTTPStatus):
     try:
         if request.method == 'PUT':
@@ -119,7 +132,7 @@ def product_delete_by_title() -> (dict, HTTPStatus):
             db.session.commit()
 
         return jsonify(
-            f'The product with title {request.json["title_delete"]} is deleted'
+            {'msg': f'The product with title {request.json["title_delete"]} is deleted'}
         ), HTTPStatus.OK
     except KeyError:
         return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
@@ -163,10 +176,10 @@ def favorite_product_register() -> (dict, HTTPStatus):
                 ).first()
             )
 
-            return result, HTTPStatus.CREATED
+            return jsonify(result), HTTPStatus.CREATED
 
     except KeyError:
-        return jsonify({'error': 'Payload is not valid'})
+        return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
     except SQLAlchemyError as e:
         return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
@@ -182,12 +195,12 @@ def favorite_product_show_by_client_id(identifier: int) -> (dict, HTTPStatus):
             if not result:
                 return jsonify({
                     'msg': f'client id {identifier} not found'
-                }), HTTPStatus.BAD_REQUEST
+                }), HTTPStatus.OK
 
             return jsonify(result), HTTPStatus.FOUND
 
     except KeyError:
-        return jsonify({'error': 'Payload is not valid'})
+        return jsonify({'error': 'Payload is not valid'}), HTTPStatus.BAD_REQUEST
     except SQLAlchemyError as e:
         return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
@@ -198,12 +211,32 @@ def favorite_product_change() -> (dict, HTTPStatus):
     try:
         if request.method == 'PUT':
 
+            favorite = request.json['favorite']
+            client_id = request.json['client_id']
+            product_id = request.json['product_id']
+
             favorite_product = request.json['favorite_update']
             favorite_product_query = FavoriteProduct.query.filter_by(product_id=favorite_product['product_id'],
                                                                      client_id=favorite_product['client_id']).first()
 
+            validate = favorite_product_share_schema.dump(
+                FavoriteProduct.query.filter_by(
+                    favorite=favorite,
+                    client_id=client_id,
+                    product_id=product_id
+                ).first()
+            )
+            if validate:
+                return jsonify(
+                    {
+                        "error": "The client already has this product on their favorites list,"
+                        f" you can not change client_id: {client_id} and product_id: {product_id}"
+                        f" with favotite: {favorite}"
+                    }
+                ), HTTPStatus.BAD_REQUEST
+
             if not product_share_schema.dump(favorite_product_query):
-                return jsonify({'msg': 'Favorite product not found'}), HTTPStatus.BAD_REQUEST
+                return jsonify({'msg': 'Favorite product not found'}), HTTPStatus.OK
 
             if not isinstance(request.json['favorite'], bool):
                 return jsonify({
@@ -240,7 +273,7 @@ def favorite_product_delete() -> (dict, HTTPStatus):
                                                                      client_id=request.json['client_id']).first()
 
             if not favorite_product_share_schema.dump(favorite_product_query):
-                return jsonify({'msg': 'Favorite product not found'}), HTTPStatus.BAD_REQUEST
+                return jsonify({'msg': 'Favorite product not found'}), HTTPStatus.OK
 
             db.session.delete(favorite_product_query)
             db.session.commit()

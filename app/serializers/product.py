@@ -40,7 +40,7 @@ class FavoriteProductSchema(ma.ModelSchema):
             'product_id'
         ]
 
-    favorite = fields.Str(required=True)
+    favorite = fields.Bool(required=True)
     client_id = fields.Int(required=True)
     product_id = fields.Int(required=True)
 
