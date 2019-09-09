@@ -1,4 +1,4 @@
-#LuizaLabs API
+# LuizaLabs API
 
 ## Run Project:
 ```sh
