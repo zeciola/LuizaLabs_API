@@ -1,0 +1,22 @@
+version: "3"
+services:
+  app:
+    restart: always
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    links:
+      - db
+    ports:
+      - "5000:5000"
+  db:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=mysql
+      - MYSQL_DATABASE=luizalabs_flask_db
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d/:ro

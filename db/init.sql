@@ -1,0 +1,2 @@
+CREATE DATABASE luizalabs_flask_db;
+use luizalabs_flask_db;

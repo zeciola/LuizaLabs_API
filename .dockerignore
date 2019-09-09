@@ -1,0 +1,14 @@
+migrations
+migrations/*
+Pipfile
+Pipfile.lock
+README.md
+__pycache__
+__pycache__/*
+LICENSE.md
+.gitignore
+Luizalabs_Flask_API.postman_collection.json
+.idea
+.idea/*
+.vscode
+.vscode/*
