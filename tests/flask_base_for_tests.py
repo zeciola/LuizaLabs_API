@@ -1,5 +1,6 @@
-from flask import url_for
 from unittest import TestCase
+
+from flask import url_for
 from json import loads
 
 from app import app, db
@@ -24,7 +25,7 @@ class BaseTestAPI(TestCase):
         return app
 
     def setUp(self):
-        self.app = app
+        self.app = self.create_app()
         self.app.testing = True
         self.app_context = self.app.test_request_context()
         self.app_context.push()
@@ -41,7 +42,7 @@ class BaseTestAPI(TestCase):
             "title": "Unit",
             "image": "s3/product/test.jpg",
             "amount": 10,
-            "price": 100.10,
+            "price": 100.0,
             "brand": "UnitTest Python",
             "review_score": 10.0
         }
@@ -57,18 +58,25 @@ class BaseTestAPI(TestCase):
         self.app.db.drop_all()
 
     # TODO: fazer a criação direto no banco com SQL_ALCHEMY em vez de utilizar os endpoints
-    def create_client(self):
+    def create_client(self, *args,**kwargs):
         self.app_client.post(url_for('client.client_register'), json=self.client)
 
-    def create_product(self):
-        self.app_client.post(url_for('product.product_register'), json=self.product)
+    def create_product(self, *args,**kwargs):
+        self.app_client.post(url_for('product.product_register'), json=self.product, headers=self.create_token())
 
-    def create_favorite_product(self):
-        self.app_client.post(url_for('product.favorite_product_register'), json=self.favorite_product)
+    def create_favorite_product(self, *args, **kwargs):
+        self.app_client.post(
+            url_for('product.favorite_product_register'),
+            json=self.favorite_product,
+            headers=self.create_token()
+        )
 
-    def create_token(self):
-        self.client.pop("fullname")
+    def create_token(self, *args, **kwargs):
+        payload = {
+            "email": self.client['email'],
+            "password": self.client['password']
+        }
 
-        login_token = self.app_client.post(url_for('auth.login'), json=self.client)
+        login_token = self.app_client.post(url_for('auth.login'), json=payload)
 
         return loads(login_token.data.decode())['msg']["access_token"]

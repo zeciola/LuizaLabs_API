@@ -36,7 +36,6 @@ class TestAuth(BaseTestAPI):
         )
 
     def test_create_token_missing_fields(self):
-
         self.create_client()
         self.client.pop('fullname')
         self.client.pop('email')
@@ -60,7 +59,6 @@ class TestAuth(BaseTestAPI):
         self.assertEqual(response.json, expect)
 
     def test_create_toke_wrong_password(self):
-
         self.create_client()
         self.client.pop('fullname')
         self.client.update({'password': 'wrong'})

@@ -99,6 +99,7 @@ def client_change_by_email() -> (dict, HTTPStatus):
     except SQLAlchemyError as e:
         return jsonify({'error': str(e.__dict__.get('orig'))}), HTTPStatus.BAD_REQUEST
 
+
 @blueprint_client.route('/client/delete/email/', methods=['DELETE'])
 @jwt_required
 def client_delete_by_email() -> (dict, HTTPStatus):
